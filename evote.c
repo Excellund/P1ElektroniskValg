@@ -13,10 +13,6 @@
 int verifyIdentity(char *CPR);
 void RemoveCharacter(char* source, char character);
 
-<<<<<<< HEAD
-=======
-// Hej
->>>>>>> parent of 332d3d0... Mike
 /* Main Function */
 int main(void) {
 
