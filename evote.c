@@ -13,6 +13,7 @@
 int verifyIdentity(char *CPR);
 void RemoveCharacter(char* source, char character);
 
+// Hej
 /* Main Function */
 int main(void) {
 
