@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 /* Constants */
 #define TRUE 1
@@ -10,19 +11,37 @@
 #define EXIT_SUCCES 0
 
 /* Prototypes */
-int verifyIdentity(char *CPR);
-void RemoveCharacter(char* source, char character);
+int verifyIdentity(char *);
+void RemoveCharacter(char *, char);
+int isLeapYear(char *, char);
 
 /* Main Function */
 int main(void) {
 
   char CPR[CPR_LEN];
+  int CPR_int, CPR_check, lines;
+
+  FILE *cp = fopen("cpr", "r+");
 
   printf("Indtast venligst dit CPR-nummer: ");
   scanf("%[0-9]", CPR);
 
-  printf("%d\n", verifyIdentity(CPR));
+  if (!verifyIdentity(CPR)) {
+    printf("Incorrect ID.\n");
+  }
 
+  CPR_int = atoi(CPR);
+
+  fseek(cp, 0L, SEEK_END);
+  lines = ftell(cp)/12;
+
+  /*while (fscanf(cp, "%d \n", &CPR_check) != EOF) {
+    if (CPR_int == CPR_check) {
+
+    }
+  }*/
+
+  fclose(cp);
   return EXIT_SUCCES;
 }
 
@@ -38,7 +57,7 @@ int verifyIdentity(char *CPR) {
 
   for (i = 0; i < 12; i++) {
     if (atoi(CPR_Splittet[1]) == 2) {
-      if (atoi(CPR_Splittet[0]) > 29) {
+      if (atoi(CPR_Splittet[0]) > 28 + isLeapYear(CPR_Splittet[2], CPR_Splittet[3][0])) {
         return FALSE;
       }
     }
@@ -52,6 +71,32 @@ int verifyIdentity(char *CPR) {
   }
 
   return TRUE;
+}
+
+int isLeapYear(char * yearLastDigits, char ciffer) {
+  char yearString[4];
+  int cifferInt;
+  int yearLastDigitsInt;
+  int year;
+
+  yearLastDigitsInt = atoi(yearLastDigits);
+  cifferInt = ciffer - '0';
+
+  if (cifferInt >= 5 && cifferInt <= 8 && yearLastDigitsInt >= 58) {
+    strcpy(yearString, "18");
+  } else if (cifferInt <= 3 || ((cifferInt == 4 || cifferInt == 9) && yearLastDigitsInt >= 37)) {
+    strcpy(yearString, "19");
+  } else {
+    strcpy(yearString, "20");
+  }
+
+  strcpy(yearString + 2, yearLastDigits);
+  year = atoi(yearString);
+
+  if ( (year % 4 == 0) && ( year % 100 != 0 || year % 400 == 0 ))
+    return 1;
+  else
+    return 0;
 }
 
 /* Maybe not necassary? */
