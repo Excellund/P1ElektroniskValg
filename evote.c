@@ -21,7 +21,7 @@ int main(void) {
   printf("Indtast venligst dit CPR-nummer: ");
   scanf("%[0-9]", CPR);
 
-  verifyIdentity(CPR);
+  printf("%d\n", verifyIdentity(CPR));
 
   return EXIT_SUCCES;
 }
@@ -36,11 +36,20 @@ int verifyIdentity(char *CPR) {
     CPR_Splittet[i/2][i == 6 ? 4 : 2] = 0;
   }
 
-  /*
-    Convert to integers
-    Check if right amount of dates
-    Remember february
-  */
+  for (i = 0; i < 12; i++) {
+    if (atoi(CPR_Splittet[1]) == 2) {
+      if (atoi(CPR_Splittet[0]) > 29) {
+        return FALSE;
+      }
+    }
+    else {
+      if (atoi(CPR_Splittet[1]) == i) {
+        if (atoi(CPR_Splittet[0]) > 30 + ((i <= 7) ? (i % 2) : ((i - 1) % 2))) {
+          return FALSE;
+        }
+      }
+    }
+  }
 
   return TRUE;
 }
