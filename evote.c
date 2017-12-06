@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <stdint.h>
 
 /* Constants */
 #define TRUE 1
@@ -12,14 +13,16 @@
 
 /* Prototypes */
 int verifyIdentity(char *);
-void RemoveCharacter(char *, char);
 int isLeapYear(char *, char);
+int BinarySearch(FILE **, char *, int *);
+int getPower(double);
+void RemoveCharacter(char *, char);
 
 /* Main Function */
 int main(void) {
 
   char CPR[CPR_LEN];
-  int CPR_int, CPR_check, lines;
+  int position = 0;
 
   FILE *cp = fopen("cpr", "r+");
 
@@ -30,16 +33,12 @@ int main(void) {
     printf("Incorrect ID.\n");
   }
 
-  CPR_int = atoi(CPR);
-
-  fseek(cp, 0L, SEEK_END);
-  lines = ftell(cp)/12;
-
-  /*while (fscanf(cp, "%d \n", &CPR_check) != EOF) {
-    if (CPR_int == CPR_check) {
-
-    }
-  }*/
+  if (BinarySearch(&cp, CPR, &position)) {
+    printf("You have already voted and aren't allowed to vote again.\n");
+  } else {
+    fseek(cp, position, SEEK_SET);
+    fwrite(CPR, 1, sizeof(CPR), cp);
+  }
 
   fclose(cp);
   return EXIT_SUCCES;
@@ -99,6 +98,43 @@ int isLeapYear(char * yearLastDigits, char ciffer) {
     return 0;
 }
 
+int BinarySearch(FILE **cp, char *CPR, int *position) {
+
+  int i, lines, current_line;
+  double CPR_number, CPR_check;
+  char CPR_check_string[CPR_LEN];
+
+  sscanf(CPR, "%lf", &CPR_number);
+
+  fseek(*cp, 0L, SEEK_END);
+  lines = ftell(*cp)/12;
+
+  current_line = ftell(*cp)/2 - ((ftell(*cp)/2) % 12);
+
+  for (i = 0; i < log10(lines)/log10(2); i++) {
+
+    fseek(*cp, current_line, SEEK_SET);
+
+    /* Read CPR as string */
+    fscanf(*cp, "%[0-9]", CPR_check_string);
+
+    /* Convert to number */
+    sscanf(CPR_check_string, "%lf", &CPR_check);
+
+    if (CPR_number == CPR_check) {
+      *position = ftell(*cp);
+      return TRUE;
+    } else if (CPR_number < CPR_check) {
+      current_line = ftell(*cp)/2 - ((ftell(*cp)/2) % 12);
+    } else if (CPR_number > CPR_check) {
+      current_line = ftell(*cp) + ftell(*cp)/2 - ((ftell(*cp) + ftell(*cp)/2) % 12);
+    }
+  }
+  *position = current_line;
+
+  return FALSE;
+}
+
 /* Maybe not necassary? */
 void RemoveCharacter(char* source, char character)
 {
@@ -111,4 +147,15 @@ void RemoveCharacter(char* source, char character)
       i++;
   }
   *i = 0;
+}
+
+int getPower(double n) {
+  int count = 0;
+
+  while (n >= 2) {
+    n /= 2;
+    count++;
+  }
+
+  return count;
 }
