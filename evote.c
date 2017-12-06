@@ -21,9 +21,10 @@ void RemoveCharacter(char *, char);
 /* Main Function */
 int main(void) {
 
-  char CPR[CPR_LEN];
+  char c, CPR[CPR_LEN];
   int position = 0;
 
+  FILE *cp_temp = fopen("cpr_temp", "w+");
   FILE *cp = fopen("cpr", "r+");
 
   printf("Indtast venligst dit CPR-nummer: ");
@@ -37,7 +38,16 @@ int main(void) {
     printf("You have already voted and aren't allowed to vote again.\n");
   } else {
     fseek(cp, position, SEEK_SET);
+    while ((c = getc(cp)) != EOF) {
+      putc(c, cp_temp);
+    }
+    fseek(cp, position, SEEK_SET);
     fwrite(CPR, 1, sizeof(CPR), cp);
+    fseek(cp, position + 12, SEEK_SET);
+    fseek(cp_temp, 0, SEEK_SET);
+    while ((c = getc(cp_temp)) != EOF) {
+      putc(c, cp);
+    }
   }
 
   fclose(cp);
