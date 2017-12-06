@@ -110,36 +110,41 @@ int isLeapYear(char * yearLastDigits, char ciffer) {
 
 int BinarySearch(FILE **cp, char *CPR, int *position) {
 
-  int i, lines, current_line;
+  int current_line, upper, lower = 0;
   double CPR_number, CPR_check;
   char CPR_check_string[CPR_LEN];
 
   sscanf(CPR, "%lf", &CPR_number);
 
   fseek(*cp, 0L, SEEK_END);
-  lines = ftell(*cp)/12;
+  upper = ftell(*cp)-12;
 
-  current_line = ftell(*cp)/2 - ((ftell(*cp)/2) % 12);
-
-  for (i = 0; i < log10(lines)/log10(2); i++) {
+  while (lower <= upper) {
+    current_line = (lower + (upper - lower) / 2) + (lower + (upper - lower) / 2) % 12;
 
     fseek(*cp, current_line, SEEK_SET);
 
-    /* Read CPR as string */
     fscanf(*cp, "%[0-9]", CPR_check_string);
 
-    /* Convert to number */
     sscanf(CPR_check_string, "%lf", &CPR_check);
 
+    printf("%d %lf %lf %d %d\n", current_line, CPR_number, CPR_check, lower, upper);
+
     if (CPR_number == CPR_check) {
-      *position = ftell(*cp);
+      *position = current_line;
       return TRUE;
-    } else if (CPR_number < CPR_check) {
-      current_line = ftell(*cp)/2 - ((ftell(*cp)/2) % 12);
-    } else if (CPR_number > CPR_check) {
-      current_line = ftell(*cp) + ftell(*cp)/2 - ((ftell(*cp) + ftell(*cp)/2) % 12);
+    } else {
+      if (CPR_number < CPR_check) {
+        upper = current_line - 12;
+      } else if (CPR_number > CPR_check) {
+        lower = current_line + 12;
+        if (lower >= upper) {
+          current_line += 12;
+        }
+      }
     }
   }
+
   *position = current_line;
 
   return FALSE;
