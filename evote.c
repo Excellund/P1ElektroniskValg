@@ -18,19 +18,20 @@
 int verifyIdentity(char *);
 int isLeapYear(char *, char);
 int BinarySearch(FILE **, char *, int *);
+char *stringToHex(char data[DATA_LEN]);
 char *generateKey(void);
+void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]);
 int getPower(double);
 void RemoveCharacter(char *, char);
 
 /* Main Function */
 int main(void) {
-  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN], data_hex[DATA_LEN*2], temp_string[2], temp_string2[2];
-  int i, position = 0;
-  unsigned int ch1, ch2;
+  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN], data_hex_original[DATA_LEN*2];
+  int position = 0, keyGenerated = FALSE;
 
   FILE *cp_temp = fopen("cpr_temp", "w+");
-  FILE *cp = fopen("test", "r+");
-  FILE *dp = fopen("data", "r+");
+  FILE *cp = fopen("identification", "r+");
+  FILE *dp = fopen("data", "a+");
 
   srand(time(NULL));
 
@@ -40,7 +41,6 @@ int main(void) {
   if (!verifyIdentity(CPR)) {
     printf("Incorrect ID.\n");
   } else {
-
     if (BinarySearch(&cp, CPR, &position)) {
       printf("You have already voted and aren't allowed to vote again.\n");
     } else {
@@ -66,26 +66,22 @@ int main(void) {
       strcat(data, ", ");
       strcat(data, person);
 
-      strcpy(key, generateKey());
-
-      printf("%s\n", key);
-
-      for(i = 0; i < strlen(data); i++){
-        sprintf((data_hex+i*2), "%02X", data[i]);
+      if (!keyGenerated) {
+        strcpy(key, generateKey());
+        keyGenerated = TRUE;
       }
 
-      for (i = 0; i < DATA_LEN*2; i += 2) {
-        strncpy(temp_string, data_hex + i, 2);
-        strncpy(temp_string2, key + i, 2);
-        sscanf(temp_string, "%02X", &ch1);
-        sscanf(temp_string2, "%02X", &ch2);
-        fprintf(dp, "%02X", ch1^ch2);
-      }
+      strcpy(data_hex_original, stringToHex(data));
 
+      printf("%s\n", data_hex_original);
+
+      encrypt(dp, key, data_hex_original);
     }
   }
 
   fclose(cp);
+  fclose(cp_temp);
+  fclose(dp);
   return EXIT_SUCCES;
 }
 
@@ -185,9 +181,22 @@ int BinarySearch(FILE **cp, char *CPR, int *position) {
   return FALSE;
 }
 
+char *stringToHex(char data[DATA_LEN]) {
+  int i;
+
+  printf("happens\n");
+
+  char *data_hex = malloc(DATA_LEN * 2 * sizeof(char));
+  for(i = 0; i < DATA_LEN; i++){
+    sprintf((data_hex + i * 2), "%02X", data[i]);
+  }
+  data_hex[DATA_LEN * 2] = '\0';
+  return data_hex;
+}
+
 char *generateKey(void) {
   const char charset[] = "0123456789ABCDEF";
-  char* key = malloc(DATA_LEN * 2 * sizeof(char));
+  char *key = malloc(DATA_LEN * 2 * sizeof(char));
   int i, charset_index;
 
   for (i = 0; i < DATA_LEN * 2; i++) {
@@ -204,8 +213,18 @@ char *generateKey(void) {
   return key;
 }
 
-char *encrypt(char key[DATA_LEN*2], char data[DATA_LEN]) {
-  return "cake";
+void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
+  char temp_string[2], temp_string2[2];
+  unsigned int ch1, ch2;
+  int i;
+
+  for (i = 0; i < DATA_LEN*2; i += 2) {
+    strncpy(temp_string, data_hex + i, 2);
+    strncpy(temp_string2, key + i, 2);
+    sscanf(temp_string, "%02X", &ch1);
+    sscanf(temp_string2, "%02X", &ch2);
+    fprintf(dp, "%02X", ch1^ch2);
+  }
 }
 
 /* Maybe not necassary? */
