@@ -18,7 +18,7 @@
 int verifyIdentity(char *);
 int isLeapYear(char *, char);
 int BinarySearch(FILE **, char *, int *);
-char *stringToHex(char data[DATA_LEN]);
+void stringToHex(char data[DATA_LEN], char data_hex[DATA_LEN * 2]);
 char *generateKey(void);
 void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]);
 int getPower(double);
@@ -26,7 +26,7 @@ void RemoveCharacter(char *, char);
 
 /* Main Function */
 int main(void) {
-  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN], data_hex_original[DATA_LEN*2];
+  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN], data_hex[DATA_LEN*2];
   int position = 0, keyGenerated = FALSE;
 
   FILE *cp_temp = fopen("cpr_temp", "w+");
@@ -66,16 +66,17 @@ int main(void) {
       strcat(data, ", ");
       strcat(data, person);
 
+      printf("%s\n", data);
+
+      stringToHex(data, data_hex);
+
       if (!keyGenerated) {
         strcpy(key, generateKey());
+        printf("%s\n", key);
         keyGenerated = TRUE;
       }
 
-      strcpy(data_hex_original, stringToHex(data));
-
-      printf("%s\n", data_hex_original);
-
-      encrypt(dp, key, data_hex_original);
+      encrypt(dp, key, data_hex);
     }
   }
 
@@ -181,19 +182,6 @@ int BinarySearch(FILE **cp, char *CPR, int *position) {
   return FALSE;
 }
 
-char *stringToHex(char data[DATA_LEN]) {
-  int i;
-
-  printf("happens\n");
-
-  char *data_hex = malloc(DATA_LEN * 2 * sizeof(char));
-  for(i = 0; i < DATA_LEN; i++){
-    sprintf((data_hex + i * 2), "%02X", data[i]);
-  }
-  data_hex[DATA_LEN * 2] = '\0';
-  return data_hex;
-}
-
 char *generateKey(void) {
   const char charset[] = "0123456789ABCDEF";
   char *key = malloc(DATA_LEN * 2 * sizeof(char));
@@ -211,6 +199,14 @@ char *generateKey(void) {
   key[DATA_LEN * 2] = '\0';
 
   return key;
+}
+
+void stringToHex(char data[DATA_LEN], char data_hex[DATA_LEN * 2]) {
+  int i;
+  for(i = 0; i < DATA_LEN; i++){
+    sprintf((data_hex + i * 2), "%02X", data[i]);
+  }
+  data_hex[DATA_LEN * 2] = '\0';
 }
 
 void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
