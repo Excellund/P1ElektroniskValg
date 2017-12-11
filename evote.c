@@ -18,15 +18,16 @@
 int verifyIdentity(char *);
 int isLeapYear(char *, char);
 int BinarySearch(FILE **, char *, int *);
+void moveFileText(FILE **cp, FILE **cp_temp, int position, char *CPR);
 void stringToHex(char data[DATA_LEN], char data_hex[DATA_LEN * 2]);
 char *generateKey(void);
-void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]);
+void encrypt(FILE **dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]);
 int getPower(double);
 void RemoveCharacter(char *, char);
 
 /* Main Function */
 int main(void) {
-  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN], data_hex[DATA_LEN*2];
+  char CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN+1], data_hex[DATA_LEN*2];
   int position = 0, keyGenerated = FALSE;
 
   FILE *cp_temp = fopen("cpr_temp", "w+");
@@ -44,17 +45,8 @@ int main(void) {
     if (BinarySearch(&cp, CPR, &position)) {
       printf("You have already voted and aren't allowed to vote again.\n");
     } else {
-      fseek(cp, position, SEEK_SET);
-      while ((c = getc(cp)) != EOF) {
-        putc(c, cp_temp);
-      }
-      fseek(cp, position, SEEK_SET);
-      fwrite(CPR, 1, sizeof(CPR), cp);
-      fseek(cp, position + 12, SEEK_SET);
-      fseek(cp_temp, 0, SEEK_SET);
-      while ((c = getc(cp_temp)) != EOF) {
-        putc(c, cp);
-      }
+
+      moveFileText(&cp, &cp_temp, position, CPR);
 
       printf("Angiv venligst din stemme for parti og person: ");
       scanf(" %[A-Z]", party);
@@ -66,17 +58,14 @@ int main(void) {
       strcat(data, ", ");
       strcat(data, person);
 
-      printf("%s\n", data);
-
       stringToHex(data, data_hex);
 
       if (!keyGenerated) {
         strcpy(key, generateKey());
-        printf("%s\n", key);
         keyGenerated = TRUE;
       }
 
-      encrypt(dp, key, data_hex);
+      encrypt(&dp, key, data_hex);
     }
   }
 
@@ -182,6 +171,23 @@ int BinarySearch(FILE **cp, char *CPR, int *position) {
   return FALSE;
 }
 
+void moveFileText(FILE **cp, FILE **cp_temp, int position, char *CPR) {
+  char c;
+  fseek(*cp, position, SEEK_SET);
+  while ((c = getc(*cp)) != EOF) {
+    putc(c, *cp_temp);
+  }
+  fseek(*cp, position, SEEK_SET);
+
+  fwrite(CPR, 1, strlen(CPR), *cp);
+  fseek(*cp, position + 12, SEEK_SET);
+  fseek(*cp_temp, 0, SEEK_SET);
+
+  while ((c = getc(*cp_temp)) != EOF) {
+    putc(c, *cp);
+  }
+}
+
 char *generateKey(void) {
   const char charset[] = "0123456789ABCDEF";
   char *key = malloc(DATA_LEN * 2 * sizeof(char));
@@ -209,7 +215,7 @@ void stringToHex(char data[DATA_LEN], char data_hex[DATA_LEN * 2]) {
   data_hex[DATA_LEN * 2] = '\0';
 }
 
-void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
+void encrypt(FILE **dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
   char temp_string[2], temp_string2[2];
   unsigned int ch1, ch2;
   int i;
@@ -219,7 +225,8 @@ void encrypt(FILE *dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
     strncpy(temp_string2, key + i, 2);
     sscanf(temp_string, "%02X", &ch1);
     sscanf(temp_string2, "%02X", &ch2);
-    fprintf(dp, "%02X", ch1^ch2);
+
+    fprintf(*dp, "%02X", ch1^ch2);
   }
 }
 
