@@ -17,7 +17,7 @@
 #define DECRYPT_YEAR 2017
 #define DECRYPT_MONTH 12
 #define DECRYPT_DAY 14
-#define DECRYPT_HOUR 12
+#define DECRYPT_HOUR 16
 
 /* Prototypes */
 int verifyIdentity(char *);
@@ -30,12 +30,13 @@ int hexToAscii(char, char);
 void hexToString(char data[DATA_LEN], char data_hex[DATA_LEN * 2]);
 char *generateKey(char *);
 void encrypt(FILE **, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]);
-void decrypt(FILE *, FILE **, char key[DATA_LEN*2]);
+void decrypt(FILE *, FILE *, char key[DATA_LEN*2]);
 
 /* Main Function */
 int main(void) {
-  char CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN+1], data_hex[DATA_LEN*2];
-  int i = 0, position = 0;
+  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN+1], data_hex[DATA_LEN*2], data_enc[DATA_LEN*2], data_dec[DATA_LEN*2], temp_string[2], data_asc[DATA_LEN];
+  unsigned int ch1, ch2;
+  int i = 0, position = 0, length, j, buf, size, k;
   time_t t;
   struct tm tm;
 
@@ -49,8 +50,7 @@ int main(void) {
 
   generateKey(key);
 
-  while (i < 3) {
-
+  while (i < 2) {
     tm = *localtime(&t);
     if (tm.tm_year + 1900 >= DECRYPT_YEAR  &&
         tm.tm_mon  + 1    >= DECRYPT_MONTH &&
@@ -70,6 +70,7 @@ int main(void) {
         if (BinarySearch(&cp, CPR, &position)) {
           printf("You have already voted and aren't allowed to vote again.\n");
         } else {
+
           moveFileText(&cp, position, CPR);
 
           printf("Angiv venligst din stemme for parti og person: ");
@@ -87,11 +88,39 @@ int main(void) {
           encrypt(&dp, key, data_hex);
         }
       }
-      i++;
     }
+    i++;
   }
+  fseek(dp, 0, SEEK_END);
+  size = ftell(dp);
 
-  decrypt(dp, &dp_decrypt, key);
+  fseek(dp, 0, SEEK_SET);
+  for (k = 0; k < size; k += DATA_LEN*2) {
+    for (i = 0; i < DATA_LEN*2; i++) {
+      c = getc(dp);
+      data_enc[i] = c;
+    }
+
+    for (i = 0; i < DATA_LEN*2; i += 2) {
+      strncpy(temp_string, data_enc + i, 2);
+      sscanf(temp_string, "%02X", &ch1);
+      strncpy(temp_string, key + i, 2);
+      sscanf(temp_string, "%02X", &ch2);
+      sprintf(data_dec, "%02X", ch1^ch2);
+
+      length = strlen(data_dec);
+      for(j = 0; j < length; j++){
+        if(j % 2 != 0){
+          data_asc[0] = (char)hexToAscii(buf, data_dec[j]);
+        }else{
+          buf = data_dec[j];
+        }
+      }
+
+      fprintf(dp_decrypt, "%c", data_asc[0]);
+    }
+    fprintf(dp_decrypt, "%c", '\n');
+  }
 
   fclose(cp);
   fclose(dp);
@@ -277,39 +306,4 @@ void encrypt(FILE **dp, char key[DATA_LEN*2], char data_hex[DATA_LEN*2]) {
 
     fprintf(*dp, "%02X", ch1^ch2);
   }
-}
-
-void decrypt(FILE *dp, FILE **dp_decrypt, char key[DATA_LEN*2]) {
-  char buf = 0, c, temp_string[2], data_enc[DATA_LEN*2], data_dec[DATA_LEN*2], data_asc[DATA_LEN];
-  unsigned int ch1, ch2;
-  int i, j, length;
-
-  fseek(dp, 0, SEEK_SET);
-  for (i = 0; i < DATA_LEN*2; i++) {
-    c = getc(dp);
-    data_enc[i] = c;
-  }
-
-  for (i = 0; i < DATA_LEN*2; i += 2) {
-    strncpy(temp_string, data_enc + i, 2);
-    sscanf(temp_string, "%02X", &ch1);
-    strncpy(temp_string, key + i, 2);
-    printf("%s\n", key);
-    sscanf(temp_string, "%02X", &ch2);
-    sprintf(data_dec, "%02X", ch1^ch2);
-    printf("dec: %s\n", data_dec);
-
-    length = strlen(data_dec);
-    for(j = 0; j < length; j++){
-      if(j % 2 != 0){
-        data_asc[0] = (char)hexToAscii(buf, data_dec[j]);
-      }else{
-        buf = data_dec[j];
-      }
-    }
-    printf("asc: %c\n", data_asc[0]);
-
-    fprintf(*dp_decrypt, "%c", data_asc[0]);
-  }
-  fprintf(*dp_decrypt, "%c", '\n');
 }
