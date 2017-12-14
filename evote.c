@@ -12,12 +12,12 @@
 #define TRUE 1
 #define FALSE 0
 #define CPR_LEN 10
-#define DATA_LEN 16
+#define DATA_LEN 4
 #define EXIT_SUCCES 0
 #define DECRYPT_YEAR 2017
 #define DECRYPT_MONTH 12
 #define DECRYPT_DAY 14
-#define DECRYPT_HOUR 16
+#define DECRYPT_HOUR 18
 
 /* Prototypes */
 int verifyIdentity(char *);
@@ -50,7 +50,7 @@ int main(void) {
 
   generateKey(key);
 
-  while (i < 2) {
+  while (i < 3) {
     tm = *localtime(&t);
     if (tm.tm_year + 1900 >= DECRYPT_YEAR  &&
         tm.tm_mon  + 1    >= DECRYPT_MONTH &&
@@ -67,18 +67,18 @@ int main(void) {
       if (!verifyIdentity(CPR)) {
         printf("Incorrect ID.\n");
       } else {
-        if (BinarySearch(&cp, CPR, &position)) {
+        if (i > 0 ? BinarySearch(&cp, CPR, &position) : 0) {
           printf("You have already voted and aren't allowed to vote again.\n");
         } else {
-
           moveFileText(&cp, position, CPR);
 
           printf("Angiv venligst din stemme for parti og person: ");
           scanf(" %[A-Z]", party);
           scanf(" %[A-Z]", person);
 
-          strcpy(data, CPR);
-          strcat(data, ", ");
+          strcpy(data, "");
+          /*strcpy(data, CPR);
+          strcat(data, ", ");*/
           strcat(data, party);
           strcat(data, ", ");
           strcat(data, person);
