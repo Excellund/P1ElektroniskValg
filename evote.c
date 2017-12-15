@@ -17,7 +17,7 @@
 #define DECRYPT_YEAR 2017
 #define DECRYPT_MONTH 12
 #define DECRYPT_DAY 14
-#define DECRYPT_HOUR 18
+#define DECRYPT_HOUR 20
 
 /* Prototypes */
 int verifyIdentity(char *);
@@ -34,7 +34,7 @@ void decrypt(FILE *, FILE *, char key[DATA_LEN*2]);
 
 /* Main Function */
 int main(void) {
-  char c, CPR[CPR_LEN], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN+1], data_hex[DATA_LEN*2], data_enc[DATA_LEN*2], data_dec[DATA_LEN*2], temp_string[2], data_asc[DATA_LEN];
+  char c, CPR[CPR_LEN+1], person[2], party[2], key[DATA_LEN*2], data[DATA_LEN+1], data_hex[DATA_LEN*2], data_enc[DATA_LEN*2], data_dec[DATA_LEN*2], temp_string[2], data_asc[DATA_LEN];
   unsigned int ch1, ch2;
   int i = 0, position = 0, length, j, buf, size, k;
   time_t t;
@@ -77,8 +77,6 @@ int main(void) {
           scanf(" %[A-Z]", person);
 
           strcpy(data, "");
-          /*strcpy(data, CPR);
-          strcat(data, ", ");*/
           strcat(data, party);
           strcat(data, ", ");
           strcat(data, person);
@@ -132,6 +130,10 @@ int verifyIdentity(char *CPR) {
 
   char CPR_Splittet[4][5];
   int i = 0;
+
+  if (strlen(CPR) > CPR_LEN) {
+    return FALSE;
+  }
 
   for (i = 0; i < CPR_LEN - 2 ; i += 2) {
     strncpy(CPR_Splittet[i/2], CPR + i, i == 6 ? 4 : 2);
