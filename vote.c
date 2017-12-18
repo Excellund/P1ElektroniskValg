@@ -16,64 +16,177 @@
 #define NEWLINE_SIZE 2
 #define EXIT_SUCCES 0
 
-/* Prototypes */
+/*Prototypes*/
+void Menu1(int, char CPR[CPR_LEN + 1]);
+void MenuPartyList();
 int verifyIdentity(char *);
 int isLeapYear(char *, char);
-int BinarySearch(FILE **, char *, int *);
-void moveFileText(FILE **cp, int position, char *CPR);
+int binarySearch(FILE **, char *, int *);
+void moveFileText(FILE **, int, char *);
+void SocialDemokratiet();
 
-/* Main Function */
-int main(void) {
-  char CPR[CPR_LEN+1], person[2], party[2], data[DATA_LEN+1];
+int main(void)
+{
+  int id = 0;
+  char CPR[CPR_LEN + 1];
+  Menu1(id, CPR);
+
+  return EXIT_SUCCES;
+}
+
+void Menu1(int id, char CPR[DATA_LEN + 1]){
+  char person[2], party[2], data[DATA_LEN+1];
   int position = 0;
+  int choice;
+  int * pId = &id;
 
   /* Initialize file pointers in read and write mode */
   FILE *cp = fopen("identification", "r+");
   FILE *rp = fopen("results", "r+");
 
-
-  while (TRUE) {
-
-    /* Promt for identification */
-    printf("Indtast venligst dit CPR-nummer: ");
-    strcpy(CPR, "");
-    scanf(" %s", CPR);
-
-    /* check identity authenticity */
-    if (!verifyIdentity(CPR)) {
-      printf("Incorrect ID.\n");
-    } else {
-
-      /* Checker whether the user has voted earlier. */
-      if (BinarySearch(&cp, CPR, &position)) {
-        printf("You have already voted and aren't allowed to vote again.\n");
-      } else {
-        moveFileText(&cp, position, CPR);
-
-        /* Promt for voting data */
-        printf("Angiv venligst din stemme for parti og person: ");
-        scanf(" %[A-Z]", party);
-        scanf(" %[A-Z]", person);
-
-        /* Collects the inputs in a single data variable */
-        strcpy(data, "");
-        strcat(data, party);
-        strcat(data, ", ");
-        strcat(data, person);
-
-        /* Print the data to the results file */
-        fseek(rp, 0, SEEK_END);
-        fprintf(rp, "%s\n", data);
-
-        return EXIT_SUCCES;
-      }
-    }
+  /*Displaing on screen*/
+  printf("-------Menu-------\n");
+  if (*pId == 0) {
+    printf("1) Identify yourself\n");
+    printf("2) How to vote and what to vote for!\n");
+  } else {
+    printf("1) CPR validated: %s\n", CPR);
+    printf("2) How to vote and what to vote for!\n");
+    printf("3) Vote now!\n");
   }
 
-  /* Close opened files */
-  fclose(cp);
-  fclose(rp);
-  return EXIT_SUCCES;
+  /*getting input*/
+  scanf("%d", &choice);
+
+  system("CLS");
+
+  /*Finding which choice was asked for*/
+  if (choice==1)
+  {
+    /*----------#1----------*/
+    if (*pId == 1) {
+
+      printf("Your identification has been successful, move on to voting!\n");
+      sleep(2);
+      Menu1(id, CPR);
+    } else {
+      /* Promt for identification */
+      printf("Indtast venligst dit CPR-nummer: ");
+      strcpy(CPR, "");
+      scanf(" %s", CPR);
+
+      if(verifyIdentity(CPR)) {
+        if (binarySearch(&cp, CPR, &position)) {
+          printf("You have already voted and aren't allowed to vote again.\n");
+        } else {
+          moveFileText(&cp, position, CPR);
+          *pId = 1;
+        }
+      } else {
+        printf("Incorrect ID.\n");
+      }
+    }
+    Menu1(id, CPR);
+  }
+  /*----------#2----------*/
+  else if (choice==2)
+  {
+  MenuPartyList();
+  }
+  /*----------#3----------*/
+  else if (choice==3)
+  {
+    if (*pId == 1) {
+      /* Promt for voting data */
+      printf("Angiv venligst din stemme for parti og person: ");
+      scanf(" %[A-Z]", party);
+      scanf(" %[A-Z]", person);
+
+      /* Collects the inputs in a single data variable */
+      strcpy(data, "");
+      strcat(data, party);
+      strcat(data, ", ");
+      strcat(data, person);
+
+      /* Print the data to the results file */
+      fseek(rp, 0, SEEK_END);
+      fprintf(rp, "%s\n", data);
+    } else {
+      printf("Please validate yourself!\n");
+      sleep(2);
+      Menu1(id, CPR);
+    }
+  }
+}
+void MenuPartyList(){
+int choice;
+
+printf("-------How to vote?-------\n\n");
+printf("Under here is a list of parties you can vote for. Every party has a letter attached, seen to the right of the party title. It's this number, you want to enter, when asked what you wanna vote for. For example, if you intent to vote for Alternativet, simply enter 'aa' when voting.\n\nIf you wanna vote for a specific member of a party you have to, in this list, enter the number attached to the party you are voting for, seen to the left of the party title. For example, if you wanna see the list of candidates in Alternativet, simply enter '9', in this list. Follow the instructions on the party page to learn more.\n\n");
+printf("-------List-------\n\n");
+printf("1) Social Demokratiet\t\ta\n");
+printf("2) Radikale Venstre\t\tb\n");
+printf("3) Det Konservative Folkeparti\tc\n");
+printf("4) Socialistisk Folkeparti\tf\n");
+printf("5) Liberal Alliance\t\tl\n");
+printf("6) Dansk Folkeparti\t\to\n");
+printf("7) Venstre\t\t\tv\n");
+printf("8) Enhedslisten\n");
+printf("9) Alternativet\n");
+printf("10) Nye Borgerlige\n");
+printf("11) Kristendemokraterne\n");
+
+/*getting input*/
+scanf("%d", &choice);
+
+system("CLS");
+
+/*Finding which choice was asked for (my style of using brackets may be different than yours*/
+if (choice==1)
+{
+SocialDemokratiet();
+}
+else if (choice==2)
+{
+
+}
+else if (choice==3)
+{
+
+}
+else if (choice==4)
+{
+
+}
+else if (choice==5)
+{
+
+}
+else if (choice==6)
+{
+
+}
+else if (choice==7)
+{
+
+}
+else if (choice==8)
+{
+
+}
+else if (choice==9)
+{
+
+}
+else if (choice==10)
+{
+
+}
+else if (choice==11)
+{
+
+}
+
 }
 
 /* Function that checks if the identification is valid */
@@ -155,7 +268,7 @@ int isLeapYear(char * yearLastDigits, char ciffer) {
 }
 
 /* Performs a binary search to find out if the CPR already has been used to vote */
-int BinarySearch(FILE **cp, char *CPR, int *position) {
+int binarySearch(FILE **cp, char *CPR, int *position) {
   int current_line, upper, lower = 0;
   double CPR_number, CPR_check;
   char CPR_check_string[CPR_LEN];
@@ -238,4 +351,14 @@ void moveFileText(FILE **cp, int position, char *CPR) {
 
   /* Close the file */
   fclose(cp_temp);
+}
+
+void SocialDemokratiet(){
+  system("CLS");
+  printf("Mette Frederiksen: 1\n");
+  printf("Ane Halsboe-Joergensen: 2\n");
+  printf("Anette Lind: 3\n");
+  printf("Astrid Krag: 4\n");
+  printf("Benny Engelbrecht: 5\n");
+  printf("Bjarne Laustsen: 6\n");
 }
