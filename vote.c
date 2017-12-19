@@ -18,12 +18,22 @@
 
 /*Prototypes*/
 void Menu1(int, char CPR[CPR_LEN + 1]);
-void MenuPartyList();
+void MenuPartyList(int id, char CPR[DATA_LEN + 1]);
 int verifyIdentity(char *);
 int isLeapYear(char *, char);
 int binarySearch(FILE **, char *, int *);
 void moveFileText(FILE **, int, char *);
-void SocialDemokratiet();
+void SocialDemokratiet(int id, char CPR[DATA_LEN + 1]);
+void RadikaleVenstre(int id, char CPR[DATA_LEN + 1]);
+void DetKonservativeFolkeparti(int id, char CPR[DATA_LEN + 1]);
+void SocialistiskFolkeparti(int id, char CPR[DATA_LEN + 1]);
+void LiberalAlliance(int id, char CPR[DATA_LEN + 1]);
+void DanskFolkeparti(int id, char CPR[DATA_LEN + 1]);
+void Venstre(int id, char CPR[DATA_LEN + 1]);
+void Enhedslisten(int id, char CPR[DATA_LEN + 1]);
+void Alternativet(int id, char CPR[DATA_LEN + 1]);
+void NyeBorgerlige(int id, char CPR[DATA_LEN + 1]);
+void KristenDemokraterne(int id, char CPR[DATA_LEN + 1]);
 
 int main(void)
 {
@@ -71,7 +81,7 @@ void Menu1(int id, char CPR[DATA_LEN + 1]){
       Menu1(id, CPR);
     } else {
       /* Promt for identification */
-      printf("Indtast venligst dit CPR-nummer: ");
+      printf("Please enter CPR: ");
       strcpy(CPR, "");
       scanf(" %s", CPR);
 
@@ -91,14 +101,14 @@ void Menu1(int id, char CPR[DATA_LEN + 1]){
   /*----------#2----------*/
   else if (choice==2)
   {
-  MenuPartyList();
+  MenuPartyList(id, CPR);
   }
   /*----------#3----------*/
   else if (choice==3)
   {
     if (*pId == 1) {
       /* Promt for voting data */
-      printf("Angiv venligst din stemme for parti og person: ");
+      printf("Enter your vote for party and the individual person: ");
       scanf(" %[A-Z]", party);
       scanf(" %[A-Z]", person);
 
@@ -118,23 +128,25 @@ void Menu1(int id, char CPR[DATA_LEN + 1]){
     }
   }
 }
-void MenuPartyList(){
+void MenuPartyList(int id, char CPR[DATA_LEN + 1]){
 int choice;
 
 printf("-------How to vote?-------\n\n");
-printf("Under here is a list of parties you can vote for. Every party has a letter attached, seen to the right of the party title. It's this number, you want to enter, when asked what you wanna vote for. For example, if you intent to vote for Alternativet, simply enter 'aa' when voting.\n\nIf you wanna vote for a specific member of a party you have to, in this list, enter the number attached to the party you are voting for, seen to the left of the party title. For example, if you wanna see the list of candidates in Alternativet, simply enter '9', in this list. Follow the instructions on the party page to learn more.\n\n");
+printf("Under here is a list of parties you can vote for. Every party has a letter attached, seen to the right of the party title. It is this number, you want to enter, when asked what you want to vote for. For example, if you intent to vote for Alternativet, simply enter '9' when voting.\n\n");
+printf("If you want to vote for a specific member of a party you have to, in this list, enter the number attached to the party you are voting for, seen to the left of the party title. For example, if you wanna see the list of candidates in Alternativet, simply enter '9', in this list. Follow the instructions on the party page to learn more.\n\n");
 printf("-------List-------\n\n");
 printf("1) Social Demokratiet\t\ta\n");
 printf("2) Radikale Venstre\t\tb\n");
 printf("3) Det Konservative Folkeparti\tc\n");
-printf("4) Socialistisk Folkeparti\tf\n");
-printf("5) Liberal Alliance\t\tl\n");
-printf("6) Dansk Folkeparti\t\to\n");
-printf("7) Venstre\t\t\tv\n");
-printf("8) Enhedslisten\n");
-printf("9) Alternativet\n");
-printf("10) Nye Borgerlige\n");
-printf("11) Kristendemokraterne\n");
+printf("4) Socialistisk Folkeparti\td\n");
+printf("5) Liberal Alliance\t\te\n");
+printf("6) Dansk Folkeparti\t\tf\n");
+printf("7) Venstre\t\t\tg\n");
+printf("8) Enhedslisten\t\t\th\n");
+printf("9) Alternativet\t\t\ti\n");
+printf("10) Nye Borgerlige\t\tj\n");
+printf("11) Kristendemokraterne\t\tk\n");
+printf("\n12) Go back\n");
 
 /*getting input*/
 scanf("%d", &choice);
@@ -144,47 +156,51 @@ system("CLS");
 /*Finding which choice was asked for (my style of using brackets may be different than yours*/
 if (choice==1)
 {
-SocialDemokratiet();
+SocialDemokratiet(id, CPR);
 }
 else if (choice==2)
 {
-
+RadikaleVenstre(id, CPR);
 }
 else if (choice==3)
 {
-
+DetKonservativeFolkeparti(id, CPR);
 }
 else if (choice==4)
 {
-
+SocialistiskFolkeparti(id, CPR);
 }
 else if (choice==5)
 {
-
+LiberalAlliance(id, CPR);
 }
 else if (choice==6)
 {
-
+DanskFolkeparti(id, CPR);
 }
 else if (choice==7)
 {
-
+Venstre(id, CPR);
 }
 else if (choice==8)
 {
-
+Enhedslisten(id, CPR);
 }
 else if (choice==9)
 {
-
+Alternativet(id, CPR);
 }
 else if (choice==10)
 {
-
+NyeBorgerlige(id, CPR);
 }
 else if (choice==11)
 {
-
+KristenDemokraterne(id, CPR);
+}
+else if (choice==12)
+{
+Menu1(id, CPR);
 }
 
 }
@@ -353,12 +369,155 @@ void moveFileText(FILE **cp, int position, char *CPR) {
   fclose(cp_temp);
 }
 
-void SocialDemokratiet(){
+void SocialDemokratiet(int id, char CPR[DATA_LEN + 1]){
   system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
   printf("Mette Frederiksen: 1\n");
   printf("Ane Halsboe-Joergensen: 2\n");
   printf("Anette Lind: 3\n");
   printf("Astrid Krag: 4\n");
-  printf("Benny Engelbrecht: 5\n");
-  printf("Bjarne Laustsen: 6\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+void RadikaleVenstre(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Andreas Steenberg: 1\n");
+  printf("Morten Østergaard: 2\n");
+  printf("Zenia Stampe: 3\n");
+  printf("Sofie Carsten Nielsen: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void DetKonservativeFolkeparti(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Naser Khader: 1\n");
+  printf("Mette Abildgaard: 2\n");
+  printf("Anders Johansson: 3\n");
+  printf("Brigitte Klintskov Jerkel: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void SocialistiskFolkeparti(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Pia Olsen Dyhr: 1\n");
+  printf("Jacob Mark: 2\n");
+  printf("Karsten Hønge: 3\n");
+  printf("Holger K. Nielsen: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void LiberalAlliance(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Anders Samuelsen: 1\n");
+  printf("Carsten Bach: 2\n");
+  printf("Christina Egelund: 3\n");
+  printf("Joachim B. Olsen: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void DanskFolkeparti(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Kristian Thulesen Dahl: 1\n");
+  printf("Peter Skaarup: 2\n");
+  printf("Soren Espersen: 3\n");
+  printf("Martin Henriksen: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void Venstre(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Bertel Haarder: 1\n");
+  printf("Hans Andersen: 2\n");
+  printf("Marianne Bredal: 3\n");
+  printf("Karen Ellemann: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void Enhedslisten(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Pernille Skipper: 1\n");
+  printf("Henning Hyllested: 2\n");
+  printf("Maria Reumert Gjerding: 3\n");
+  printf("Stine Brix: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void Alternativet(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Josephine Fock: 1\n");
+  printf("Torsten Gejl: 2\n");
+  printf("Christian Poll: 3\n");
+  printf("Carolina Magdalene Maier: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void NyeBorgerlige(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("John Jensen: 1\n");
+  printf("Jesper Hammer: 2\n");
+  printf("Helene Romme: 3\n");
+  printf("Carsten Winther: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
+}
+
+void KristenDemokraterne(int id, char CPR[DATA_LEN + 1]){
+  system("CLS");
+  printf("-------How to vote for specific member?-------\n\n");
+  printf("Here you can see the specific members of your chosen party. See the number of the member you want to vote for, and combine it with the partys letter. For example, if you want to vote for 'Astrid Krag' of Social Demokratiet, enter a4 when voting\n\n");
+  printf("Per Breindahl: 1\n");
+  printf("Stig Grenov: 2\n");
+  printf("Jens Ove Kjeldsen: 3\n");
+  printf("Jacob Rabjerg: 4\n");
+  printf("\nPress any key to go back...");
+  getch();
+  system("CLS");
+  MenuPartyList(id, CPR);
 }
